@@ -1,0 +1,16 @@
+# App stuff
+
+/info.json
+/nginx.conf
+
+# Python stuff
+
+__pycache__
+
+# Virtual environment
+
+/bin
+/include
+/lib
+/local
+/share

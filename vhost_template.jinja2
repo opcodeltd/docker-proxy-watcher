@@ -1,0 +1,29 @@
+{%- for vhost in vhosts -%}
+upstream {{ vhost.upstream_name }} {
+    {% for port in vhost.ports %}
+    server localhost:{{ port }};
+    {%- endfor %}
+}
+server {
+    listen 80;
+    server_name {{ vhost.server_name }};
+    access_log /var/log/nginx/{{ vhost.server_name }}.log;
+    location / {
+        #proxy_pass http://localhost:{{ vhost.ports[0] }}/;
+        proxy_pass http://{{ vhost.upstream_name }};
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Port 80;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_buffering off;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        gzip on;
+        gzip_disable "MSIE [1-6]\.(?!.*SV1)";
+        gzip_types text/css application/javascript application/x-javascript application/json;
+        gzip_vary on;
+    }
+}
+{% endfor %}
